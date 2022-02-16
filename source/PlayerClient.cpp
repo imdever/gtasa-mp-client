@@ -20,6 +20,7 @@ void PlayerClient::socketConnected() {
 void PlayerClient::packetReceived(Packet packet) {
     MultiplayerPacket* multiplayer_packet = reinterpret_cast<MultiplayerPacket*>(packet.packet_data);
     pedSyncHandler();
+    lockAcess();
     if (packet.packet_data == nullptr)
         return;
     if ( multiplayer_packet->type == PacketType::YOU_ID) {
@@ -53,17 +54,19 @@ void PlayerClient::packetReceived(Packet packet) {
             MultiplayerPlugin::output("UPDATE NULL PED\n\r");
         }
     }
-
     // delete packet data
     delete[] static_cast<char*>(packet.packet_data);
+    unlockAcess();
 }
 
 void PlayerClient::pedSyncHandler() {
+    lockAcess();
     UpdatePedPacket update_packet;
     update_packet.type   = PacketType::UPDATE_PED;
     update_packet.ped_id = this->client_id;
     update_packet.info   = PlayerClient::getPlayerPedInfo();
     sendPacket(&update_packet, sizeof(UpdatePedPacket));
+    unlockAcess();
 }
 
 PedInfo PlayerClient::getPlayerPedInfo() {
@@ -77,4 +80,13 @@ PedInfo PlayerClient::getPlayerPedInfo() {
 
 void PlayerClient::deleteLater() {
     delete_later = true;
+}
+
+
+void PlayerClient::lockAcess() {
+    access_mutex.lock();
+}
+
+void PlayerClient::unlockAcess() {
+    access_mutex.unlock();
 }

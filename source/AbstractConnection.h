@@ -11,6 +11,7 @@ struct Packet;
 #include <stdlib.h>
 #include <stdio.h>
 #include <thread>
+#include <mutex>
 #include "AbstractListener.h"
 
 
@@ -33,6 +34,7 @@ protected:
     SOCKET socket;
     AbstractListener* listener_ptr = nullptr; // null for client socket
     std::thread* receive_thread_ptr;
+    std::mutex send_mutex;
     bool connected = false, delete_this = false, reading = false;
 
 public:

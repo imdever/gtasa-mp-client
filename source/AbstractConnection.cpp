@@ -77,6 +77,7 @@ Packet AbstractConnection::receivePacket() {
 }
 
 void AbstractConnection::sendPacket(void* data, int32_t size) {
+    const std::lock_guard<std::mutex> lock(send_mutex);
     if (!isConnected()) {
         // socket is not connected, error!;
         return;
@@ -133,11 +134,11 @@ void AbstractConnection::disconnect() {
 }
 
 void AbstractConnection::socketDisconnected() {
-    cout << "Socket disconnected, default handler.\n";
+    //cout << "Socket disconnected, default handler.\n";
 }
 
 void AbstractConnection::socketConnected() {
-    cout << "Socket connected, default handler.\n";
+    //cout << "Socket connected, default handler.\n";
 }
 
 AbstractConnection* AbstractConnection::connect(string ip, uint16_t port) {

@@ -8,6 +8,7 @@ struct ListenerParams;
 #include <windows.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <mutex>
 #include <list>
 #include "AbstractConnection.h"
 
@@ -23,7 +24,7 @@ protected:
     ListenerParams params;
     SOCKADDR_IN addr;
     SOCKET listen_socket;
-
+    std::mutex disconnect_mutex;
     std::list<AbstractConnection*> connections_list;
     uint32_t connections_count = 0;
     bool listening = false;

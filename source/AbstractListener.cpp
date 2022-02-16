@@ -58,6 +58,7 @@ void AbstractListener::newConnection(SOCKET connection_socket) {
 }
 
 void AbstractListener::dropConnection(SOCKET droped_socket) {
+    const std::lock_guard<std::mutex> lock(disconnect_mutex);
     AbstractConnection* delete_connection;
     std::list<AbstractConnection*>::iterator it;
     for (it = connections_list.begin(); it != connections_list.end(); ++it) {

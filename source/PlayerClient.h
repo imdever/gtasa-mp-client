@@ -14,13 +14,16 @@ class PlayerClient;
 #include "AbstractConnection.h"
 #include "AbstractListener.h"
 #include <chrono>
+#include <mutex>
 #include <thread>
 
 class PlayerClient : public AbstractConnection {
     int32_t client_id;
     SyncPed* sync_peds[1500]; // 1000 for players 500 for another peds
+    std::mutex access_mutex;
     std::thread* player_sync_thread_ptr;
     bool delete_later = false;
+
 
 public:
     PlayerClient();
@@ -28,6 +31,9 @@ public:
     PedInfo getPlayerPedInfo();
     void pedSyncHandler();
     void deleteLater();
+
+    void lockAcess();
+    void unlockAcess();
 
 protected:
     void socketConnected() override;

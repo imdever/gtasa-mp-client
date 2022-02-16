@@ -18,4 +18,5 @@ void SyncPed::setPedInfo(PedInfo& info) {
 	pos.y = info.pos.y;
 	pos.z = info.pos.z;
 	game_ped_ptr->SetPosn(pos);
+	game_ped_ptr->UpdatePosition();
 }
