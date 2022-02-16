@@ -16,5 +16,7 @@ public:
 	SyncPed(int32_t server_id /* server id for this ped */);
 	~SyncPed();
 
+	CPed* getPed();
+	PedInfo getPedInfo();
 	void setPedInfo(PedInfo& info);
 };

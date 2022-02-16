@@ -1,14 +1,17 @@
 #include "PlayerClient.h"
 
 
-PlayerClient::PlayerClient() {
-    memset(&sync_peds, 0x00, sizeof(sync_peds));
-}
-
 PlayerClient::PlayerClient(AbstractConnection connection) : AbstractConnection(connection) {
-    for (int32_t i = 0; i < 1024; i++) {
+    for (int32_t i = 0; i < 1500; i++) {
         sync_peds[i] = nullptr;
     }
+
+    ped_sync_thread_ptr = new thread([this] {
+        while (!delete_later) {
+            std::this_thread::sleep_for(std::chrono::microseconds(8000)); // 125 times per second
+            updatePedsHandler();
+        }
+        });
 }
 
 void PlayerClient::socketConnected() {
@@ -19,8 +22,8 @@ void PlayerClient::socketConnected() {
 
 void PlayerClient::packetReceived(Packet packet) {
     MultiplayerPacket* multiplayer_packet = reinterpret_cast<MultiplayerPacket*>(packet.packet_data);
-    pedSyncHandler();
-    lockAcess();
+    playerSyncHandler();
+    lockAccess();
     if (packet.packet_data == nullptr)
         return;
     if ( multiplayer_packet->type == PacketType::YOU_ID) {
@@ -56,17 +59,41 @@ void PlayerClient::packetReceived(Packet packet) {
     }
     // delete packet data
     delete[] static_cast<char*>(packet.packet_data);
-    unlockAcess();
+    unlockAccess();
 }
 
-void PlayerClient::pedSyncHandler() {
-    lockAcess();
+void PlayerClient::playerSyncHandler() {
+    lockAccess();
     UpdatePedPacket update_packet;
     update_packet.type   = PacketType::UPDATE_PED;
     update_packet.ped_id = this->client_id;
     update_packet.info   = PlayerClient::getPlayerPedInfo();
     sendPacket(&update_packet, sizeof(UpdatePedPacket));
-    unlockAcess();
+    unlockAccess();
+}
+
+void PlayerClient::updatePedsHandler() {
+    lockAccess();
+    for (int32_t i = 0; i < 1500; i++) {
+        SyncPed* ped_ptr = sync_peds[i];
+        if (ped_ptr == nullptr)
+            continue;
+        CPed* game_ped_ptr = ped_ptr->getPed();
+        if (game_ped_ptr == nullptr)
+            continue;
+        PedInfo ped_info = ped_ptr->getPedInfo();
+        CVector ped_position = game_ped_ptr->GetPosition();
+        CVector ped_next_position(ped_info.pos.x, ped_info.pos.y, ped_info.pos.z);
+        CVector ped_move_delta;
+        ped_move_delta = ped_next_position - ped_position;
+        double simple_lenght = abs(ped_move_delta.x) + abs(ped_move_delta.y) + abs(ped_move_delta.z);
+        if (simple_lenght < 6) {
+            ped_move_delta *= 0.08;
+        }
+        game_ped_ptr->SetPosn(ped_position + ped_move_delta);
+        game_ped_ptr->UpdatePosition();
+    }
+    unlockAccess();
 }
 
 PedInfo PlayerClient::getPlayerPedInfo() {
@@ -83,10 +110,10 @@ void PlayerClient::deleteLater() {
 }
 
 
-void PlayerClient::lockAcess() {
+void PlayerClient::lockAccess() {
     access_mutex.lock();
 }
 
-void PlayerClient::unlockAcess() {
+void PlayerClient::unlockAccess() {
     access_mutex.unlock();
 }

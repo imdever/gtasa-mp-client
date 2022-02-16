@@ -17,6 +17,14 @@ void SyncPed::setPedInfo(PedInfo& info) {
 	pos.x = info.pos.x;
 	pos.y = info.pos.y;
 	pos.z = info.pos.z;
-	game_ped_ptr->SetPosn(pos);
-	game_ped_ptr->UpdatePosition();
+}
+
+CPed* SyncPed::getPed() {
+	if( game_ped_ptr->IsPointerValid())
+		return game_ped_ptr;
+	return nullptr;
+}
+
+PedInfo SyncPed::getPedInfo() {
+	return info;
 }

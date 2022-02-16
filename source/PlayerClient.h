@@ -21,19 +21,21 @@ class PlayerClient : public AbstractConnection {
     int32_t client_id;
     SyncPed* sync_peds[1500]; // 1000 for players 500 for another peds
     std::mutex access_mutex;
-    std::thread* player_sync_thread_ptr;
+    std::thread* ped_sync_thread_ptr;
     bool delete_later = false;
 
 
 public:
-    PlayerClient();
     PlayerClient(AbstractConnection connection);
     PedInfo getPlayerPedInfo();
-    void pedSyncHandler();
+
+    void playerSyncHandler();
+    void updatePedsHandler();
+
     void deleteLater();
 
-    void lockAcess();
-    void unlockAcess();
+    void lockAccess();
+    void unlockAccess();
 
 protected:
     void socketConnected() override;
