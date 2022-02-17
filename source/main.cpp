@@ -30,10 +30,6 @@ MultiplayerPlugin::MultiplayerPlugin(): handle(NULL){
     ViPr(ADDR_BYPASS_VIDS_USA10,6); // OFF load screen
     *(BYTE *)ADDR_ENTRY = 5;
     memset((PVOID)ADDR_BYPASS_VIDS_USA10,0x90,6);
-    ViPr(0x866CD8,10);
-    ViPr(0x866CCC,10);
-    strcpy((PCHAR)0x866CD8,"title");
-    strcpy((PCHAR)0x866CCC,"title");
     static int keyPressTime = 0;
     Events::gameProcessEvent += [this] {
     if (FindPlayerPed() && KeyPressed(VK_F9) && CTimer::m_snTimeInMilliseconds - keyPressTime > 500) {
