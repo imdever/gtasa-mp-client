@@ -1,0 +1,1 @@
+Put main.scm and script.img to YOUR_GTA_FOLDER/data/script
