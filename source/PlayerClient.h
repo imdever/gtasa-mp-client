@@ -9,6 +9,7 @@ class PlayerClient;
 #include <stdlib.h>
 #include <stdio.h>
 #include "SyncPed.h"
+#include "SyncCar.h"
 #include "MainHeader.h"
 #include "Packets.h"
 #include "AbstractConnection.h"
@@ -17,21 +18,28 @@ class PlayerClient;
 #include <mutex>
 #include <thread>
 
+
 class PlayerClient : public AbstractConnection {
     int32_t client_id;
     SyncPed* sync_peds[1500]; // 1000 for players 500 for another peds
+    SyncCar* sync_cars[1000];
     std::mutex access_mutex;
     std::thread* ped_sync_thread_ptr;
+    std::thread* car_thread_ptr;
     bool delete_later = false;
+    //int peddid;
+    //float ped_rotation_delta;
 
 
 public:
     PlayerClient(AbstractConnection connection);
     PedInfo getPlayerPedInfo();
-
+   // void GetRott();
     void playerSyncHandler();
     void updatePedsHandler();
-
+    //void updateCarsHandler();
+    void carSyncHandler();
+    void SetCarDriver();
     void deleteLater();
 
     void lockAccess();

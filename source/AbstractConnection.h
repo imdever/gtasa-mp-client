@@ -76,5 +76,3 @@ protected:
     virtual Packet receivePacket();
     virtual void disconnect();
 };
-
-

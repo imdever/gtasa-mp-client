@@ -5,7 +5,7 @@
 enum class PacketType {
     REQUEST_ID, FAIL_TO_REQUEST_ID, YOU_ID,
     CREATEM_PLAYER, DELETE_PLAYER,
-    CREATE_PED, DELETE_PED, UPDATE_PED
+    CREATE_PED, DELETE_PED, UPDATE_PED, SPAWN_CAR, UPDATE_CAR
 };
 
 struct Vector3d {
@@ -14,10 +14,21 @@ struct Vector3d {
 
 struct PedInfo {
     Vector3d pos;
+    float currot;
 };
+/*
+struct CarInfo {
+    Vector3d pos;
+    //float currot;
+};*/
 
 struct MultiplayerPacket {
     PacketType type;
+};
+
+struct UpdateCarPacket : public MultiplayerPacket {
+    //int32_t ped_id;
+    //PedInfo info;
 };
 
 struct YourIDPacket : public MultiplayerPacket {
